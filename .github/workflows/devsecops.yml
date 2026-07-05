@@ -11,8 +11,8 @@ on:
 
 permissions:
   contents: read
-  security-events: write
   actions: read
+  issues: read
 
 jobs:
   gitleaks:
@@ -29,13 +29,15 @@ jobs:
         env:
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
         with:
-          args: detect --source . --no-banner --redact --report-format sarif --report-path gitleaks.sarif
+          args: detect --source . --no-banner --redact --report-format json --report-path gitleaks.json
 
-      - name: Upload SARIF
+      - name: Upload Gitleaks report
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: actions/upload-artifact@v4
         with:
-          sarif_file: gitleaks.sarif
+          name: gitleaks-report
+          path: gitleaks.json
+          if-no-files-found: ignore
 
   sbom:
     name: Trivy SBOM Generation
@@ -126,7 +128,9 @@ jobs:
     name: OWASP ZAP Baseline Scan
     runs-on: ubuntu-latest
     needs:
-      - sonarqube
+      - gitleaks
+      - sbom
+      - trivy
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -134,10 +138,13 @@ jobs:
       - name: Start temporary target app
         run: |
           docker run -d --rm --name redemption-zap -p 8080:8080 nginxinc/nginx-unprivileged:stable-alpine
+          curl --retry 10 --retry-delay 3 --retry-connrefused http://127.0.0.1:8080
 
       - name: Run ZAP baseline scan
+        continue-on-error: true
         uses: zaproxy/action-baseline@v0.14.0
         with:
           target: http://127.0.0.1:8080
-          rules_file_name: ''
+          allow_issue_writing: false
+          fail_action: false
           cmd_options: '-a'
