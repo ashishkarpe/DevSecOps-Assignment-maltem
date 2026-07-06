@@ -35,7 +35,6 @@ locals {
     coredns    = {}
     kube-proxy = {}
     vpc-cni    = {}
-    ebs-csi    = {}
   }
 
   effective_github_deploy_role_arn = var.github_deploy_role_arn != "" ? var.github_deploy_role_arn : (
@@ -133,7 +132,7 @@ module "eks" {
   cloudwatch_log_group_retention_in_days   = 30
   create_kms_key                           = true
 
-  cluster_addons = local.cluster_addons
+  cluster_addons = var.enable_cluster_addons ? local.cluster_addons : {}
 
   node_security_group_additional_rules = {
     ingress_all_from_cluster = {
@@ -149,11 +148,11 @@ module "eks" {
   eks_managed_node_groups = {
     default = {
       name           = "${var.cluster_name}-default"
-      instance_types = ["t3.large"]
+      instance_types = ["t3.micro"]
       capacity_type  = "ON_DEMAND"
       min_size       = 2
-      max_size       = 6
-      desired_size   = 3
+      max_size       = 4
+      desired_size   = 2
       labels = {
         workload = "redemption"
       }
