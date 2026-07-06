@@ -43,6 +43,7 @@ Legend:
 - [x] `docs/design.md` created
 - [x] `docs/ai-ml-production-readiness.md` created
 - [x] `docs/aws-test-runbook.md` created
+- [x] `docs/terraform-troubleshooting.md` created
 - [x] `docs/design.pdf` created
 - [x] `docs/architecture.drawio` created
 - [x] `docs/architecture.svg` created
@@ -54,6 +55,7 @@ Legend:
 - [x] Terraform formatting passes with `terraform -chdir=terraform fmt -check`
 - [x] Terraform initialized with `terraform -chdir=terraform init -backend=false`
 - [~] Terraform validation attempted, but local AWS provider schema startup timed out on this machine
+- [x] Terraform module/provider versions pinned for repeatable validation
 - [x] Kubernetes YAML parses successfully
 - [~] Kubernetes client dry-run attempted, but the configured local cluster endpoint is not running
 - [x] GitHub Actions workflow YAML parses successfully

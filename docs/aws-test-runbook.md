@@ -32,6 +32,8 @@ Expected account:
 
 ## 2. Plan First
 
+If using `tfenv` on Apple Silicon, check `docs/terraform-troubleshooting.md` before running Terraform.
+
 ```bash
 terraform -chdir=terraform init
 terraform -chdir=terraform validate
@@ -114,4 +116,3 @@ Also check the AWS Console for:
 - Elastic IP addresses
 - EBS volumes
 - CloudWatch log groups
-

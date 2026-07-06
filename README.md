@@ -10,6 +10,7 @@ This workspace contains a submission scaffold for the Accor Thailand cloud engin
 - `docs/design.pdf` - Exported design document for submission
 - `docs/ai-ml-production-readiness.md` - Optional AI/ML guardrails and production readiness guidance
 - `docs/aws-test-runbook.md` - Safe AWS plan/apply/destroy test procedure with budget guardrails
+- `docs/terraform-troubleshooting.md` - Terraform validation notes for Apple Silicon/tfenv
 - `docs/architecture.drawio` - Draw.io source for the architecture diagram
 - `docs/architecture.svg` - Exported architecture diagram image
 - `.github/workflows/devsecops.yml` - CI/CD pipeline with Gitleaks, Trivy, SBOM generation, SonarQube, and OWASP ZAP

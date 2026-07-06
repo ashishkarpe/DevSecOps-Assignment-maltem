@@ -4,12 +4,7 @@ provider "aws" {
   allowed_account_ids = [var.expected_account_id]
 }
 
-data "aws_availability_zones" "available" {
-  state = "available"
-}
-
 locals {
-  azs = slice(data.aws_availability_zones.available.names, 0, 3)
   cluster_addons = {
     coredns    = {}
     kube-proxy = {}
@@ -20,12 +15,12 @@ locals {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "~> 5.0"
+  version = "5.21.0"
 
   name = "${var.cluster_name}-vpc"
   cidr = var.vpc_cidr
 
-  azs                    = local.azs
+  azs                    = var.azs
   private_subnets        = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
   public_subnets         = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
   enable_nat_gateway     = true
@@ -46,7 +41,7 @@ module "vpc" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.0"
+  version = "20.37.2"
 
   cluster_name                             = var.cluster_name
   cluster_version                          = "1.30"
@@ -75,7 +70,9 @@ module "eks" {
 
   eks_managed_node_groups = {
     default = {
+      name           = "${var.cluster_name}-default"
       instance_types = ["t3.large"]
+      capacity_type  = "ON_DEMAND"
       min_size       = 2
       max_size       = 6
       desired_size   = 3
