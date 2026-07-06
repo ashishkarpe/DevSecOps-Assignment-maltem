@@ -139,8 +139,19 @@ jobs:
 
       - name: Start temporary target app
         run: |
-          docker run -d --rm --name redemption-zap -p 8080:8080 nginxinc/nginx-unprivileged:stable-alpine
-          curl --retry 10 --retry-delay 3 --retry-connrefused http://127.0.0.1:8080
+          docker build -t redemption-zap .
+          docker run -d --rm --name redemption-zap -p 8080:8080 redemption-zap
+
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent http://127.0.0.1:8080 >/dev/null; then
+              exit 0
+            fi
+
+            sleep 3
+          done
+
+          docker logs redemption-zap
+          exit 1
 
       - name: Run ZAP baseline scan
         continue-on-error: true
@@ -150,3 +161,7 @@ jobs:
           allow_issue_writing: false
           fail_action: false
           cmd_options: '-a'
+
+      - name: Cleanup temporary target app
+        if: always()
+        run: docker rm -f redemption-zap || true
