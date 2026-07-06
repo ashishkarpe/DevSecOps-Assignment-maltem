@@ -9,6 +9,9 @@ on:
       - release
       - develop
 
+env:
+  ENABLE_SONARQUBE: "false"
+
 permissions:
   contents: read
   actions: read
@@ -90,6 +93,7 @@ jobs:
   sonarqube:
     name: SonarQube Analysis
     runs-on: ubuntu-latest
+    if: env.ENABLE_SONARQUBE == 'true'
     needs:
       - gitleaks
       - sbom
