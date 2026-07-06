@@ -150,9 +150,9 @@ module "eks" {
       name           = "${var.cluster_name}-default"
       instance_types = ["t3.micro"]
       capacity_type  = "ON_DEMAND"
-      min_size       = 2
+      min_size       = 3
       max_size       = 4
-      desired_size   = 2
+      desired_size   = 3
       labels = {
         workload = "redemption"
       }
