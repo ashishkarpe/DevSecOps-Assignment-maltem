@@ -76,6 +76,8 @@ jobs:
         env:
           IMAGE_URI: ${{ steps.image.outputs.image_uri }}
         run: |
+          kubectl apply -f k8s/namespace.yaml
+          kubectl wait --for=jsonpath='{.status.phase}'=Active namespace/"$K8S_NAMESPACE" --timeout=60s
           kubectl apply -f k8s/
           kubectl set image deployment/redemption app="$IMAGE_URI" -n "$K8S_NAMESPACE"
           kubectl rollout status deployment/redemption -n "$K8S_NAMESPACE" --timeout=5m
