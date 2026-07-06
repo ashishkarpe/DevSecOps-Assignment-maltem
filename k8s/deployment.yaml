@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/name: redemption
     app.kubernetes.io/component: api
 spec:
-  replicas: 3
+  replicas: 2
   strategy:
     type: RollingUpdate
     rollingUpdate:
