@@ -174,3 +174,25 @@ resource "helm_release" "aws_load_balancer_controller" {
 
   depends_on = [kubernetes_service_account.aws_load_balancer_controller]
 }
+
+resource "aws_eks_access_entry" "github_deploy" {
+  count = var.github_deploy_role_arn != "" ? 1 : 0
+
+  cluster_name  = module.eks.cluster_name
+  principal_arn = var.github_deploy_role_arn
+  type          = "STANDARD"
+}
+
+resource "aws_eks_access_policy_association" "github_deploy_admin" {
+  count = var.github_deploy_role_arn != "" ? 1 : 0
+
+  cluster_name  = module.eks.cluster_name
+  principal_arn = var.github_deploy_role_arn
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+
+  access_scope {
+    type = "cluster"
+  }
+
+  depends_on = [aws_eks_access_entry.github_deploy]
+}

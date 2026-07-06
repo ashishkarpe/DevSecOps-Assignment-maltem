@@ -34,6 +34,8 @@ Expected account:
 
 If using `tfenv` on Apple Silicon, check `docs/terraform-troubleshooting.md` before running Terraform.
 
+If you want GitHub Actions to deploy to EKS later, set up the OIDC role first using `docs/github-aws-oidc-setup.md`.
+
 ```bash
 terraform -chdir=terraform init
 terraform -chdir=terraform validate
@@ -49,6 +51,15 @@ terraform -chdir=terraform plan \
   -var aws_profile=avaniakarpe \
   -var region=ap-southeast-1 \
   -var budget_notification_email=your-email@example.com
+```
+
+To include GitHub deployment access in the cluster plan:
+
+```bash
+terraform -chdir=terraform plan \
+  -var aws_profile=avaniakarpe \
+  -var region=ap-southeast-1 \
+  -var github_deploy_role_arn=arn:aws:iam::063884340510:role/github-actions-redemption-deploy
 ```
 
 ## 3. Apply Only After Reviewing The Plan

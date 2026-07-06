@@ -67,3 +67,9 @@ variable "enable_alb_controller" {
   default     = true
   description = "Install the AWS Load Balancer Controller with IRSA when true."
 }
+
+variable "github_deploy_role_arn" {
+  type        = string
+  default     = ""
+  description = "Optional GitHub Actions OIDC deploy role ARN that should receive EKS cluster access."
+}

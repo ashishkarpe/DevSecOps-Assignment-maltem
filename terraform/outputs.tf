@@ -17,3 +17,7 @@ output "ecr_repository_url" {
 output "aws_load_balancer_controller_role_arn" {
   value = var.enable_alb_controller ? module.aws_load_balancer_controller_irsa[0].iam_role_arn : null
 }
+
+output "github_deploy_role_access_enabled" {
+  value = var.github_deploy_role_arn != ""
+}

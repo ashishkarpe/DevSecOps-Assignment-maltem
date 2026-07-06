@@ -10,6 +10,7 @@ This workspace contains a submission scaffold for the Accor Thailand cloud engin
 - `docs/design.pdf` - Exported design document for submission
 - `docs/ai-ml-production-readiness.md` - Optional AI/ML guardrails and production readiness guidance
 - `docs/aws-test-runbook.md` - Safe AWS plan/apply/destroy test procedure with budget guardrails
+- `docs/github-aws-oidc-setup.md` - GitHub OIDC role setup for ECR and EKS deployment
 - `docs/terraform-troubleshooting.md` - Terraform validation notes for Apple Silicon/tfenv
 - `docs/architecture.drawio` - Draw.io source for the architecture diagram
 - `docs/architecture.svg` - Exported architecture diagram image
@@ -52,5 +53,7 @@ It expects these prerequisites:
 - Terraform has already created the EKS cluster and ECR repository
 - GitHub secret `AWS_DEPLOY_ROLE_ARN` exists for OIDC-based AWS authentication
 - The cluster has the prerequisites needed by the manifests, especially the AWS Load Balancer Controller for the `Ingress`
+
+The exact AWS OIDC role setup is documented in `docs/github-aws-oidc-setup.md`.
 
 The deployment workflow is intentionally `workflow_dispatch` only so it does not create cost or change AWS resources on every push.
