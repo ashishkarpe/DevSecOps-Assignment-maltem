@@ -44,13 +44,15 @@ Run:
 ```bash
 terraform -chdir=terraform plan \
   -var aws_profile=avaniakarpe \
-  -var region=ap-southeast-1
+  -var region=ap-southeast-1 \
+  -var enable_cluster_addons=false
 ```
 
 ```bash
 terraform -chdir=terraform apply \
   -var aws_profile=avaniakarpe \
-  -var region=ap-southeast-1
+  -var region=ap-southeast-1 \
+  -var enable_cluster_addons=false
 ```
 
 Then read the role ARN from:
@@ -86,17 +88,28 @@ If you prefer to create the role outside Terraform, pass it in explicitly:
 terraform -chdir=terraform plan \
   -var aws_profile=avaniakarpe \
   -var region=ap-southeast-1 \
-  -var github_deploy_role_arn=arn:aws:iam::063884340510:role/github-actions-redemption-deploy
+  -var github_deploy_role_arn=arn:aws:iam::063884340510:role/github-actions-redemption-deploy \
+  -var enable_cluster_addons=false
 ```
 
 ```bash
 terraform -chdir=terraform apply \
   -var aws_profile=avaniakarpe \
   -var region=ap-southeast-1 \
-  -var github_deploy_role_arn=arn:aws:iam::063884340510:role/github-actions-redemption-deploy
+  -var github_deploy_role_arn=arn:aws:iam::063884340510:role/github-actions-redemption-deploy \
+  -var enable_cluster_addons=false
 ```
 
 ## 5. Trigger deployment from GitHub
+
+Before relying on the `Ingress` path, run a second Terraform apply to install cluster add-ons:
+
+```bash
+terraform -chdir=terraform apply \
+  -var aws_profile=avaniakarpe \
+  -var region=ap-southeast-1 \
+  -var enable_cluster_addons=true
+```
 
 After Terraform finishes successfully:
 

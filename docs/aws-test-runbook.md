@@ -41,7 +41,8 @@ terraform -chdir=terraform init
 terraform -chdir=terraform validate
 terraform -chdir=terraform plan \
   -var aws_profile=avaniakarpe \
-  -var region=ap-southeast-1
+  -var region=ap-southeast-1 \
+  -var enable_cluster_addons=false
 ```
 
 To include the budget guardrail in the plan, provide an email address:
@@ -50,7 +51,8 @@ To include the budget guardrail in the plan, provide an email address:
 terraform -chdir=terraform plan \
   -var aws_profile=avaniakarpe \
   -var region=ap-southeast-1 \
-  -var budget_notification_email=your-email@example.com
+  -var budget_notification_email=your-email@example.com \
+  -var enable_cluster_addons=false
 ```
 
 To include GitHub deployment access in the cluster plan:
@@ -59,10 +61,22 @@ To include GitHub deployment access in the cluster plan:
 terraform -chdir=terraform plan \
   -var aws_profile=avaniakarpe \
   -var region=ap-southeast-1 \
-  -var github_deploy_role_arn=arn:aws:iam::063884340510:role/github-actions-redemption-deploy
+  -var github_deploy_role_arn=arn:aws:iam::063884340510:role/github-actions-redemption-deploy \
+  -var enable_cluster_addons=false
 ```
 
 If you use the new Terraform-managed OIDC role, you can skip `github_deploy_role_arn` and let Terraform create and output the deploy role automatically.
+
+## 2.5 Enable cluster add-ons in a second pass
+
+After the first apply succeeds and the EKS cluster exists, run a second plan/apply to install Kubernetes and Helm-based add-ons such as the AWS Load Balancer Controller:
+
+```bash
+terraform -chdir=terraform plan \
+  -var aws_profile=avaniakarpe \
+  -var region=ap-southeast-1 \
+  -var enable_cluster_addons=true
+```
 
 ## 3. Apply Only After Reviewing The Plan
 
@@ -74,7 +88,8 @@ Estimated cost for a short live test:
 ```bash
 terraform -chdir=terraform apply \
   -var aws_profile=avaniakarpe \
-  -var region=ap-southeast-1
+  -var region=ap-southeast-1 \
+  -var enable_cluster_addons=false
 ```
 
 ## 4. Deploy Kubernetes Manifests

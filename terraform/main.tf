@@ -5,24 +5,28 @@ provider "aws" {
 }
 
 data "aws_eks_cluster" "this" {
+  count = var.enable_cluster_addons ? 1 : 0
+
   name = module.eks.cluster_name
 }
 
 data "aws_eks_cluster_auth" "this" {
+  count = var.enable_cluster_addons ? 1 : 0
+
   name = module.eks.cluster_name
 }
 
 provider "kubernetes" {
-  host                   = data.aws_eks_cluster.this.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.this.certificate_authority[0].data)
-  token                  = data.aws_eks_cluster_auth.this.token
+  host                   = var.enable_cluster_addons ? data.aws_eks_cluster.this[0].endpoint : "https://example.invalid"
+  cluster_ca_certificate = var.enable_cluster_addons ? base64decode(data.aws_eks_cluster.this[0].certificate_authority[0].data) : null
+  token                  = var.enable_cluster_addons ? data.aws_eks_cluster_auth.this[0].token : null
 }
 
 provider "helm" {
   kubernetes {
-    host                   = data.aws_eks_cluster.this.endpoint
-    cluster_ca_certificate = base64decode(data.aws_eks_cluster.this.certificate_authority[0].data)
-    token                  = data.aws_eks_cluster_auth.this.token
+    host                   = var.enable_cluster_addons ? data.aws_eks_cluster.this[0].endpoint : "https://example.invalid"
+    cluster_ca_certificate = var.enable_cluster_addons ? base64decode(data.aws_eks_cluster.this[0].certificate_authority[0].data) : null
+    token                  = var.enable_cluster_addons ? data.aws_eks_cluster_auth.this[0].token : null
   }
 }
 
@@ -175,7 +179,7 @@ module "aws_load_balancer_controller_irsa" {
 }
 
 resource "kubernetes_service_account" "aws_load_balancer_controller" {
-  count = var.enable_alb_controller ? 1 : 0
+  count = var.enable_alb_controller && var.enable_cluster_addons ? 1 : 0
 
   metadata {
     name      = "aws-load-balancer-controller"
@@ -192,7 +196,7 @@ resource "kubernetes_service_account" "aws_load_balancer_controller" {
 }
 
 resource "helm_release" "aws_load_balancer_controller" {
-  count      = var.enable_alb_controller ? 1 : 0
+  count      = var.enable_alb_controller && var.enable_cluster_addons ? 1 : 0
   name       = "aws-load-balancer-controller"
   namespace  = "kube-system"
   repository = "https://aws.github.io/eks-charts"
@@ -211,7 +215,7 @@ resource "helm_release" "aws_load_balancer_controller" {
 
   set {
     name  = "serviceAccount.name"
-    value = kubernetes_service_account.aws_load_balancer_controller[0].metadata[0].name
+    value = "aws-load-balancer-controller"
   }
 
   set {
@@ -228,7 +232,7 @@ resource "helm_release" "aws_load_balancer_controller" {
 }
 
 resource "aws_eks_access_entry" "github_deploy" {
-  count = local.effective_github_deploy_role_arn != "" ? 1 : 0
+  count = (var.github_deploy_role_arn != "" || var.create_github_actions_oidc_resources) ? 1 : 0
 
   cluster_name  = module.eks.cluster_name
   principal_arn = local.effective_github_deploy_role_arn
@@ -236,7 +240,7 @@ resource "aws_eks_access_entry" "github_deploy" {
 }
 
 resource "aws_eks_access_policy_association" "github_deploy_admin" {
-  count = local.effective_github_deploy_role_arn != "" ? 1 : 0
+  count = (var.github_deploy_role_arn != "" || var.create_github_actions_oidc_resources) ? 1 : 0
 
   cluster_name  = module.eks.cluster_name
   principal_arn = local.effective_github_deploy_role_arn

@@ -68,6 +68,12 @@ variable "enable_alb_controller" {
   description = "Install the AWS Load Balancer Controller with IRSA when true."
 }
 
+variable "enable_cluster_addons" {
+  type        = bool
+  default     = false
+  description = "Install Kubernetes and Helm-based add-ons only after the EKS cluster already exists."
+}
+
 variable "github_deploy_role_arn" {
   type        = string
   default     = ""
