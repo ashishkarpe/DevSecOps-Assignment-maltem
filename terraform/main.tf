@@ -33,6 +33,58 @@ locals {
     vpc-cni    = {}
     ebs-csi    = {}
   }
+
+  effective_github_deploy_role_arn = var.github_deploy_role_arn != "" ? var.github_deploy_role_arn : (
+    var.create_github_actions_oidc_resources ? aws_iam_role.github_actions_deploy[0].arn : ""
+  )
+}
+
+resource "aws_iam_openid_connect_provider" "github_actions" {
+  count = var.create_github_actions_oidc_resources ? 1 : 0
+
+  url             = "https://token.actions.githubusercontent.com"
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = [var.github_oidc_thumbprint]
+}
+
+data "aws_iam_policy_document" "github_actions_assume_role" {
+  count = var.create_github_actions_oidc_resources ? 1 : 0
+
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = [aws_iam_openid_connect_provider.github_actions[0].arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:sub"
+      values   = [var.github_repository_subject]
+    }
+  }
+}
+
+resource "aws_iam_role" "github_actions_deploy" {
+  count = var.create_github_actions_oidc_resources ? 1 : 0
+
+  name               = var.github_actions_deploy_role_name
+  assume_role_policy = data.aws_iam_policy_document.github_actions_assume_role[0].json
+}
+
+resource "aws_iam_role_policy_attachment" "github_actions_deploy_admin" {
+  count = var.create_github_actions_oidc_resources && var.attach_admin_policy_to_github_deploy_role ? 1 : 0
+
+  role       = aws_iam_role.github_actions_deploy[0].name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 
 module "vpc" {
@@ -176,18 +228,18 @@ resource "helm_release" "aws_load_balancer_controller" {
 }
 
 resource "aws_eks_access_entry" "github_deploy" {
-  count = var.github_deploy_role_arn != "" ? 1 : 0
+  count = local.effective_github_deploy_role_arn != "" ? 1 : 0
 
   cluster_name  = module.eks.cluster_name
-  principal_arn = var.github_deploy_role_arn
+  principal_arn = local.effective_github_deploy_role_arn
   type          = "STANDARD"
 }
 
 resource "aws_eks_access_policy_association" "github_deploy_admin" {
-  count = var.github_deploy_role_arn != "" ? 1 : 0
+  count = local.effective_github_deploy_role_arn != "" ? 1 : 0
 
   cluster_name  = module.eks.cluster_name
-  principal_arn = var.github_deploy_role_arn
+  principal_arn = local.effective_github_deploy_role_arn
   policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
 
   access_scope {

@@ -19,5 +19,13 @@ output "aws_load_balancer_controller_role_arn" {
 }
 
 output "github_deploy_role_access_enabled" {
-  value = var.github_deploy_role_arn != ""
+  value = local.effective_github_deploy_role_arn != ""
+}
+
+output "github_actions_deploy_role_arn" {
+  value = var.create_github_actions_oidc_resources ? aws_iam_role.github_actions_deploy[0].arn : null
+}
+
+output "github_actions_oidc_provider_arn" {
+  value = var.create_github_actions_oidc_resources ? aws_iam_openid_connect_provider.github_actions[0].arn : null
 }

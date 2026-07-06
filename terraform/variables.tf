@@ -73,3 +73,33 @@ variable "github_deploy_role_arn" {
   default     = ""
   description = "Optional GitHub Actions OIDC deploy role ARN that should receive EKS cluster access."
 }
+
+variable "create_github_actions_oidc_resources" {
+  type        = bool
+  default     = true
+  description = "Create the GitHub Actions OIDC provider and deploy role in AWS when true."
+}
+
+variable "github_actions_deploy_role_name" {
+  type        = string
+  default     = "github-actions-redemption-deploy"
+  description = "IAM role name assumed by the GitHub Actions deployment workflow."
+}
+
+variable "github_repository_subject" {
+  type        = string
+  default     = "repo:ashishkarpe/DevSecOps-Assignment-maltem:ref:refs/heads/develop"
+  description = "GitHub OIDC subject claim allowed to assume the deployment role."
+}
+
+variable "github_oidc_thumbprint" {
+  type        = string
+  default     = "6938fd4d98bab03faadb97b34396831e3780aea1"
+  description = "Thumbprint used for the GitHub Actions OIDC provider."
+}
+
+variable "attach_admin_policy_to_github_deploy_role" {
+  type        = bool
+  default     = true
+  description = "Attach AdministratorAccess to the GitHub deploy role for the short assessment run."
+}

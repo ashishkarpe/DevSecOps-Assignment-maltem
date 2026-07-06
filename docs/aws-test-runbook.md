@@ -62,6 +62,8 @@ terraform -chdir=terraform plan \
   -var github_deploy_role_arn=arn:aws:iam::063884340510:role/github-actions-redemption-deploy
 ```
 
+If you use the new Terraform-managed OIDC role, you can skip `github_deploy_role_arn` and let Terraform create and output the deploy role automatically.
+
 ## 3. Apply Only After Reviewing The Plan
 
 Estimated cost for a short live test:
