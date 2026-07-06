@@ -14,6 +14,9 @@ This workspace contains a submission scaffold for the Accor Thailand cloud engin
 - `docs/architecture.drawio` - Draw.io source for the architecture diagram
 - `docs/architecture.svg` - Exported architecture diagram image
 - `.github/workflows/devsecops.yml` - CI/CD pipeline with Gitleaks, Trivy, SBOM generation, SonarQube, and OWASP ZAP
+- `.github/workflows/deploy.yml` - Manual build and deploy workflow for ECR and EKS
+- `Dockerfile` - Container image for the demo Redemption service
+- `app/` - Minimal static application content served by nginx
 
 ## What this solution is designed to show
 
@@ -39,3 +42,15 @@ The GitHub Actions workflow expects these secrets when you want SonarQube analys
 If those secrets are missing, the SonarQube job skips cleanly while the other scans still run.
 
 The pipeline also generates a CycloneDX SBOM with Trivy and uploads it as a workflow artifact.
+
+## Delivery pipeline
+
+The repository also contains a manual deployment workflow that builds the application image, pushes it to Amazon ECR, and deploys it to Amazon EKS.
+
+It expects these prerequisites:
+
+- Terraform has already created the EKS cluster and ECR repository
+- GitHub secret `AWS_DEPLOY_ROLE_ARN` exists for OIDC-based AWS authentication
+- The cluster has the prerequisites needed by the manifests, especially the AWS Load Balancer Controller for the `Ingress`
+
+The deployment workflow is intentionally `workflow_dispatch` only so it does not create cost or change AWS resources on every push.

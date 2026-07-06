@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Redemption Service</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f6f8f4;
+        --panel: #ffffff;
+        --text: #1f2a1f;
+        --muted: #5c6a5c;
+        --accent: #0f766e;
+        --border: #d9e2d9;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: linear-gradient(180deg, #eef7f3 0%, var(--bg) 100%);
+        color: var(--text);
+      }
+
+      main {
+        max-width: 760px;
+        margin: 8vh auto;
+        padding: 24px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 28px;
+        box-shadow: 0 18px 60px rgba(15, 118, 110, 0.08);
+      }
+
+      h1 {
+        margin-top: 0;
+        font-size: 2rem;
+      }
+
+      p {
+        line-height: 1.6;
+      }
+
+      .meta {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .pill {
+        display: inline-block;
+        margin-top: 12px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: #dff7f3;
+        color: var(--accent);
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="panel">
+        <p class="meta">Cloud Engineer Assessment 2026</p>
+        <h1>Redemption service is online</h1>
+        <p>
+          This container image is built in GitHub Actions, published to Amazon ECR,
+          and deployed to Amazon EKS through the assessment delivery pipeline.
+        </p>
+        <span class="pill">Ready for ALB health checks</span>
+      </section>
+    </main>
+  </body>
+</html>

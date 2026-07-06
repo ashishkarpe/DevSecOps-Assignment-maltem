@@ -79,6 +79,15 @@ kubectl get pods -n redemption
 kubectl get ingress -n redemption
 ```
 
+Or use the manual GitHub Actions deployment workflow after these prerequisites are in place:
+
+- The ECR repository from Terraform exists
+- The GitHub repository has secret `AWS_DEPLOY_ROLE_ARN`
+- The EKS cluster can trust GitHub OIDC through that role
+- The cluster has the AWS Load Balancer Controller installed if you want the `Ingress` to become an ALB
+
+The workflow builds the image from `Dockerfile`, pushes it to ECR, applies the manifests, then updates the deployment image and waits for rollout.
+
 ## 5. Destroy Same Day
 
 Destroy the Kubernetes workload first:

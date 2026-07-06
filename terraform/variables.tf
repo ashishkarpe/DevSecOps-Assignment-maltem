@@ -55,3 +55,15 @@ variable "budget_notification_email" {
   default     = ""
   description = "Email address for AWS Budget notifications. Leave empty to skip budget creation."
 }
+
+variable "ecr_repository_name" {
+  type        = string
+  default     = "redemption"
+  description = "Amazon ECR repository name used by the application deployment pipeline."
+}
+
+variable "enable_alb_controller" {
+  type        = bool
+  default     = true
+  description = "Install the AWS Load Balancer Controller with IRSA when true."
+}
