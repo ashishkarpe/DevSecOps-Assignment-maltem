@@ -76,6 +76,7 @@ jobs:
         env:
           IMAGE_URI: ${{ steps.image.outputs.image_uri }}
         run: |
+          set -euo pipefail
           kubectl apply -f k8s/namespace.yaml
           kubectl wait --for=jsonpath='{.status.phase}'=Active namespace/"$K8S_NAMESPACE" --timeout=60s
           kubectl apply -f k8s/serviceaccount.yaml
@@ -85,7 +86,12 @@ jobs:
           kubectl apply -f k8s/hpa.yaml
           kubectl apply -f k8s/ingress.yaml
           sed "s|IMAGE_PLACEHOLDER|$IMAGE_URI|g" k8s/deployment.yaml | kubectl apply -f -
-          kubectl rollout status deployment/redemption -n "$K8S_NAMESPACE" --timeout=5m
+          if ! kubectl rollout status deployment/redemption -n "$K8S_NAMESPACE" --timeout=10m; then
+            kubectl get deploy,rs,pods -n "$K8S_NAMESPACE" -o wide
+            kubectl describe deployment redemption -n "$K8S_NAMESPACE"
+            kubectl describe pods -n "$K8S_NAMESPACE"
+            exit 1
+          fi
 
       - name: Smoke test service
         run: |
